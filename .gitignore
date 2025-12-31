@@ -1,0 +1,6 @@
+/AiProcessing/wyoming/*.json
+/AiProcessing/wyoming/*.onnx
+/AiProcessing/wyoming/.locks/*
+/AiProcessing/wyoming/temp/*
+/AiProcessing/wyoming/__pycache__/*
+/AiProcessing/wyoming/models--rhasspy--faster-whisper-medium-int8/*
