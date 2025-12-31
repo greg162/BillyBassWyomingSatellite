@@ -3,11 +3,14 @@ import subprocess
 import audioop
 import time
 import signal
+import random
 from billy_bass import BillyBass
 
 # --- CONFIG ---
 # Audio Settings
-THRESHOLD = 1500  # Adjust this if mouth opens too much/little
+THRESHOLD = 500   # Lowered to ensure sensitivity
+MIN_OPEN_TIME = 0.15 # Minimum time (seconds) to keep mouth open
+DEBUG = False     # Set True to see RMS values in logs
 
 # Initialize Billy Bass
 bass = BillyBass()
@@ -31,6 +34,8 @@ def run():
     )
 
     bass.move_body(out=True)
+    mouth_state = False
+    next_toggle_time = 0
     
     try:
         while True:
@@ -44,7 +49,26 @@ def run():
             
             # 2. Check volume
             rms = audioop.rms(data, 2)
-            bass.set_mouth(rms > THRESHOLD)
+            if DEBUG:
+                sys.stderr.write(f"RMS: {rms}\n")
+
+            # 3. Animate Mouth (Anime Style Flapping)
+            if rms > THRESHOLD:
+                now = time.time()
+                if now >= next_toggle_time:
+                    # If coming from silence, force open, otherwise toggle
+                    if next_toggle_time == 0:
+                        mouth_state = True
+                    else:
+                        mouth_state = not mouth_state
+                    
+                    bass.set_mouth(mouth_state)
+                    next_toggle_time = now + random.uniform(0.1, 0.3)
+            else:
+                if mouth_state:
+                    bass.set_mouth(False)
+                    mouth_state = False
+                next_toggle_time = 0
 
     except Exception as e:
         pass
