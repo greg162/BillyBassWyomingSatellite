@@ -29,9 +29,10 @@ services:
   openwakeword:
     image: rhasspy/wyoming-openwakeword
     container_name: billy_wake
-    command: --preload-model 'hey_jarvis'
+    command: --custom-model-dir /custom --preload-model 'hey_billy'
     volumes:
       - ./wyoming:/data
+      - ./wakeWords/en/hey_billy:/custom
     ports:
       - "10400:10400" 
     restart: unless-stopped
