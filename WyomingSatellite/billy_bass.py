@@ -13,12 +13,16 @@ class BillyBass:
         GPIO.setwarnings(False)
         
         # Setup Pins
-        self.pins = [self.MOUTH_IN1, self.MOUTH_IN2, self.BODY_IN3, self.BODY_IN4]
         for pin in self.pins:
             GPIO.setup(pin, GPIO.OUT)
 
-    def set_mouth(self, is_open):
-        """Opens or closes the mouth."""
+    def set_mouth(self, is_open: bool):
+        """
+        Opens or closes the mouth.
+
+        Args:
+            is_open: True to open the mouth, False to close it.
+        """
         if is_open:
             GPIO.output(self.MOUTH_IN1, GPIO.HIGH)
             GPIO.output(self.MOUTH_IN2, GPIO.LOW)
@@ -26,10 +30,12 @@ class BillyBass:
             GPIO.output(self.MOUTH_IN1, GPIO.LOW)
             GPIO.output(self.MOUTH_IN2, GPIO.LOW)
 
-    def move_body(self, out=True):
+    def move_body(self, out: bool = True):
         """
-        out=True: Head pops out (Extend Body)
-        out=False: Head goes back (Relax)
+        Moves the body in or out.
+
+        Args:
+            out: True to pop head out (extend), False to relax.
         """
         if out:
             # Head Out: 17 LOW, 27 HIGH (Matches test.py 'Extend Body')
@@ -40,10 +46,12 @@ class BillyBass:
             GPIO.output(self.BODY_IN3, GPIO.LOW)
             GPIO.output(self.BODY_IN4, GPIO.LOW)
 
-    def move_tail(self, out=True):
+    def move_tail(self, out: bool = True):
         """
-        out=True: Tail pops out (Extend Tail)
-        out=False: Tail goes back (Relax)
+        Moves the tail.
+
+        Args:
+            out: True to extend tail, False to relax.
         """
         if out:
             # Tail Out: 23 HIGH, 24 LOW

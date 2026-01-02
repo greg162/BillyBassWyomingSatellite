@@ -1,70 +1,42 @@
+#!/usr/bin/env python3
 from billy_bass import BillyBass
 import time
 
-# Initialize Billy Bass
-bass = BillyBass()
+def run_diagnostic():
+    """
+    Runs a quick Power On Self Test (POST) to verify hardware.
+    """
+    bass = BillyBass()
+    print("--- Billy Bass Diagnostic ---")
 
-try:
-    print("Testing Mouth...")
-    # Move Mouth Open
-    bass.set_mouth(True)
-    time.sleep(0.5)
-    bass.set_mouth(False)
-    time.sleep(0.5)
+    try:
+        # 1. Mouth Check
+        print("[1/3] Testing Mouth...")
+        for _ in range(3):
+            bass.set_mouth(True)
+            time.sleep(0.15)
+            bass.set_mouth(False)
+            time.sleep(0.15)
 
-    # Extend the tail
-    print("Extending Tail...")
-    bass.move_tail(True)
-    time.sleep(2)
-    bass.stop_all()
+        # 2. Tail Check
+        print("[2/3] Testing Tail...")
+        bass.move_tail(True)
+        time.sleep(0.5)
+        bass.move_tail(False)
+        time.sleep(0.5)
 
-    print("Resetting")
-    time.sleep(2)
+        # 3. Body Check
+        print("[3/3] Testing Body...")
+        bass.move_body(True)
+        time.sleep(1.0)
+        bass.move_body(False)
+        
+        print("--- Diagnostic Complete ---")
 
-    # Extend the body
-    print("Extending Body...")
-    bass.move_body(True)
-    time.sleep(2)
-    bass.stop_all()
+    except KeyboardInterrupt:
+        print("\nDiagnostic interrupted.")
+    finally:
+        bass.cleanup()
 
-    print('Resetting')
-    time.sleep(2)
-
-    # Extend the body and open the mouth
-    print("Extending Body and Opening Mouth...")
-
-    bass.move_body(True)
-    bass.set_mouth(True)
-
-    time.sleep(0.1)
-    bass.set_mouth(False)
-
-    time.sleep(0.1)
-    bass.set_mouth(True)
-
-    time.sleep(0.1)
-    bass.set_mouth(False)
-
-    time.sleep(0.1)
-    bass.set_mouth(True)
-
-    time.sleep(0.1)
-    bass.set_mouth(False)
-
-    time.sleep(0.1)
-    bass.set_mouth(True)
-
-    time.sleep(0.1)
-    bass.set_mouth(False)
-
-    time.sleep(0.1)
-    bass.set_mouth(True)
-
-    bass.stop_all()
-
-except KeyboardInterrupt:
-    print("Stopping...")
-
-finally:
-    bass.cleanup()
-    print("Cleaned up GPIO.")
+if __name__ == "__main__":
+    run_diagnostic()
