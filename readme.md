@@ -11,7 +11,7 @@ It has the following features:
 
   * The body extends when waiting for a command.
   * The mouth flaps when an audio response is returned.
-  * If you connect up your Voice Assistant up to 
+  * I've included the wake word "Hey Billy" for _Wyoming Wake Word_. 
 
 ## Requirements
 
