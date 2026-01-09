@@ -10,9 +10,9 @@ It has the following features:
   * The mouth flaps when an audio response is returned.
   * If you connect up your Voice Assistant up to 
 
-# Requirements
+## Requirements
 
-## Hardware
+**Hardware**
 
   * A knock off Billy Bass from AliExpress - I've included a screenshot of the one I purchased above.
   * Rasperry Pi  - Any version should work fine, this was tested on an RPI 2
@@ -22,13 +22,13 @@ It has the following features:
   * A power supply that supports multiple voltages.
   * Some wires and basic soldering skills
 
-# Software
+**Software**
 
   * Rasperry Pi Imager
 
-# Installation Instructions
+## Installation Instructions
 
-## Setup the Raspberry Pi
+**Setup the Raspberry Pi**
 
   * Plugin the USB Microphone and the speakers to your Raspberry Pi.
   * Go through the standard install process to add Raspberry OS to an SD card or SSD and add it to your Raspberry Pi.
@@ -36,7 +36,7 @@ It has the following features:
     * When setting it up - ensure that you enable SSH.
     * You'll also be asked about default the WiFi network to connect to. I **HIGHLY** recommend using ethernet as the RPI has limited power and the Mic plus WiFi can cause power issues.
 
-## Install Wyoming Satellite
+**Install Wyoming Satellite**
 
   * Switch on your Raspberry PI and SSH into it.
   * Intall the required dependencies: 
@@ -77,12 +77,12 @@ NOTE: This differs from the installation instructions on the Wyoming Satellite r
 script/run --help
 ```
 
-## Determine your Audio input and output devices and test Wyoming Satellite
+**Determine your Audio input and output devices and test Wyoming Satellite**
 
   * For this step I recommend following the tutorial from the offical Wyoming Satellite: https://github.com/rhasspy/wyoming-satellite/blob/master/docs/tutorial_2mic.md
   * Follow the instructions above and then run your wyoming-satellite to confirm everything is working.
 
-## Wiring Everything up
+**Wiring Everything up**
 
 Below is the wiring diagram to connect up all the components:
 
@@ -92,7 +92,7 @@ When connecting the power supply to your L298 Sensor, I recommend setting the po
 
 With a lot of the Billy Bass there isn't an easy way to tell which way around the motors should connect to the L298 module. I recommend connecting it up randomly, then if the fish doesn't do the expected when running the script below, you can swap the wires around.
 
-## Setup the Billy Bass scripts
+**Setup the Billy Bass scripts**
 
 SSH into your Billy Bass and ensure you're in the home directory
 
@@ -123,6 +123,18 @@ cd wyoming-satellite/
 
 Run the command to start the wyoming Speaker and test everything works as expected:
 
+
+**Running the Wyoming Speaker**
+
+Run the Wyoming Speaker start up command, but include/amend the following options:
+
+```
+--snd-command 'python3 /home/<PIUSERNAME>/BillyBassWyomingSatellite/billybass.py talk' \
+--detection-command 'python3 /home/<PIUSERNAME>/BillyBassWyomingSatellite/billybass.py wake'
+```
+
+When you ask a question, the fish head should extend out and as he responds his mouth should flap!
+
 ## Troubleshooting
 
 **The fish doesn't do one of the actions at all:**
@@ -136,14 +148,3 @@ If you hear a wearing sound, but there's no movement, try swapping the motor wir
 **The fish extends his head when he should extend his body and extends his tail when he should extend his tail when he should extend his head.**
 
 The motor wires are the wrong way around for the body, swap the connections in the L298 module and it should work.
-
-# Running the Wyoming Speaker
-
-Run the Wyoming Speaker start up command, but include/amend the following options:
-
-```
---snd-command 'python3 /home/<PIUSERNAME>/BillyBassWyomingSatellite/billybass.py talk' \
---detection-command 'python3 /home/<PIUSERNAME>/BillyBassWyomingSatellite/billybass.py wake'
-```
-
-When you ask a question, the fish head should extend out and as he responds his mouth should flap!
