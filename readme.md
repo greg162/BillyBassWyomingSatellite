@@ -9,9 +9,9 @@ https://www.youtube.com/watch?v=FuD_6neGKRo
 
 It has the following features:
 
-  * The body extends when waiting for a command.
-  * The mouth flaps when an audio response is returned.
-  * I've included the wake word "Hey Billy" for _Wyoming Wake Word_. 
+  * The body extends to "listen" when the wake word is detected.
+  * The mouth flaps in sync with the audio response.
+  * Includes a custom wake word model ("Hey Billy") for Wyoming Wake Word.
 
 ## Requirements
 
@@ -28,39 +28,42 @@ It has the following features:
 **Software**
 
   * Rasperry Pi Imager
+  * Home Assistant (with Wyoming Protocol support) -
 
 ## Installation Instructions
 
 **Setup the Raspberry Pi**
 
-  * Plugin the USB Microphone and the speakers to your Raspberry Pi.
-  * Go through the standard install process to add Raspberry OS to an SD card or SSD and add it to your Raspberry Pi.
-    * Install Raspberry Pi OS Legacy Lite - If you use a more modern version you can have issues with Python compatibilty in Wyoming Satellite.
-    * When setting it up - ensure that you enable SSH.
-    * You'll also be asked about default the WiFi network to connect to. I **HIGHLY** recommend using ethernet as the RPI has limited power and the Mic plus WiFi can cause power issues.
+  * Plugin the USB Microphone and speakers.
+  * Flash the SD card using Raspberry Pi Imager:
+      * **OS:** Select Raspberry Pi OS Legacy Lite (Bullseye). Note: Newer versions (Bookworm/Python 3.13) may have compatibility issues with Wyoming Satellite on older hardware.
+      * **Settings:** Enable SSH and set a username/password.
+      * **Network:** I **HIGHLY** recommend using Ethernet. The RPi 2 has limited power; running a USB WiFi dongle + Mic + Audio can cause brownouts.
 
 **Install Wyoming Satellite**
 
-  * Switch on your Raspberry PI and SSH into it.
-  * Intall the required dependencies: 
+Intall the required dependencies: 
+
 ```
 sudo apt-get update
 sudo apt-get install --no-install-recommends  \
   git \
   python3-venv
 ```
-  * Clone the Wyoming Satellite repository:
+
+Clone the Wyoming Satellite repository:
+
 ```
 git clone https://github.com/rhasspy/wyoming-satellite.git
 ```
 
-  * Navigate into the Wyoming Satellite directory:
+Navigate into the Wyoming Satellite directory:
 
 ```
 cd wyoming-satellite
 ```
 
-  * Run the installation command:
+Run the installation command:
 
 ```
 cd wyoming-satellite/
@@ -72,68 +75,61 @@ python3 -m venv .venv
   -e '.[webrtc]'
 ```
 
-NOTE: This differs from the installation instructions on the Wyoming Satellite repository. This is because the `[all]` command attempts to install a library that isn't compatible with this version of Python, but also isn't required for our setup.
+_Note: We use [webrtc] instead of [all] to avoid installing heavy AI libraries incompatible with the RPi 2._
 
-  * Run setup script below to confirm everything has installed:
+Run setup script below to confirm everything has installed:
 
 ```
 script/run --help
 ```
 
-**Determine your Audio input and output devices and test Wyoming Satellite**
+**Audio Setup**
 
-  * For this step I recommend following the tutorial from the offical Wyoming Satellite: https://github.com/rhasspy/wyoming-satellite/blob/master/docs/tutorial_2mic.md
-  * Follow the instructions above and then run your wyoming-satellite to confirm everything is working.
+Determine your Audio input and output devices and test Wyoming Satellite - I recommend following the tutorial from the offical Wyoming Satellite instructions: https://github.com/rhasspy/wyoming-satellite/blob/master/docs/tutorial_2mic.md
 
-**Wiring Everything up**
+
+**Wiring**
 
 Below is the wiring diagram to connect up all the components:
 
 ![Wiring Schematic to connect Billy Bass to your Raspberry Pi](/media/schematic.png)
 
-When connecting the power supply to your L298 Sensor, I recommend setting the power to 6V  and only increasing if the Billy Bass seems sluggish. 
+  * Connect the Raspberry Pi to the L298N and the Fish Motors according to this diagram:
+    * Voltage: Set your power supply to 6V. Increase slightly if the fish is sluggish, but do not exceed the motor ratings.
+    * Polarity: Fish motors often lack clear markings. Connect them randomly first; if the fish moves backward (e.g., mouth closes instead of opening), swap the wires at the L298N terminal.
 
-With a lot of the Billy Bass there isn't an easy way to tell which way around the motors should connect to the L298 module. I recommend connecting it up randomly, then if the fish doesn't do the expected when running the script below, you can swap the wires around.
-
-**Setup the Billy Bass scripts**
-
-SSH into your Billy Bass and ensure you're in the home directory
+**Install the Billy Bass scripts**
 
 ```
 cd ~/
-```
-
-Clone this projects repository:
-
-```
 git clone https://github.com/greg162/BillyBassWyomingSatellite.git
 ```
 
-Next, you'll want to test that the fish is wired up correctly, run the included test script:
+**Test the Hardware** - Run the included test script to verify wiring:
 
 ```
-python3 BillyBassWyomingSatellite/test.py
+python3 BillyBassWyomingSatellite/wyomingSatellite/test.py
 ```
 
 As the script runs it will output on the screen what the fish should be doing.
 
+_The script will print actions to the screen. Watch the fish to ensure the movements match the text._
 
-Navigate into the wyoming-satellite directory:
+**Running the Satellite**
+
+Navigate to the satellite directory:
+```
+cd ~/wyoming-satellite/
+```
+Run the startup command, pointing to the custom scripts for movement. Replace `<PIUSERNAME>` with your actual username (e.g., pi):
 
 ```
-cd wyoming-satellite/
-```
-
-Run the command to start the wyoming Speaker and test everything works as expected:
-
-
-**Running the Wyoming Speaker**
-
-Run the Wyoming Speaker start up command, but include/amend the following options:
-
-```
---snd-command 'python3 /home/<PIUSERNAME>/BillyBassWyomingSatellite/billybass.py talk' \
---detection-command 'python3 /home/<PIUSERNAME>/BillyBassWyomingSatellite/billybass.py wake'
+script/run \
+  --name 'BillyBass' \
+  --uri 'tcp://0.0.0.0:10700' \
+  --mic-command 'arecord -r 16000 -c 1 -f S16_LE -t raw' \
+  --snd-command 'python3 /home/<PIUSERNAME>/BillyBassWyomingSatellite/wyomingSatellite/billybass.py talk' \
+  --detection-command 'python3 /home/<PIUSERNAME>/BillyBassWyomingSatellite/wyomingSatellite/billybass.py wake'
 ```
 
 When you ask a question, the fish head should extend out and as he responds his mouth should flap!
@@ -141,13 +137,17 @@ When you ask a question, the fish head should extend out and as he responds his 
 ## Troubleshooting
 
 **The fish doesn't do one of the actions at all:**
+Check your GPIO connections. Ensure the pins defined in billybass.py match your physical wiring.
 
-Check the connections and ensure everything is connected to the correct pins.
+**I hear a whirring noise, but the fish doesn't move:**
+The motor is spinning the wrong way against the mechanism. Swap the two wires for that specific motor at the L298N module.
 
-**I hear a noise, but the fish doesn't move**
+**The fish extends his head when he should extend his tail:**
+The wires for the body motor are swapped. Reverse the connections for the Body Motor on the L298N module.
 
-If you hear a wearing sound, but there's no movement, try swapping the motor wires around in your L298 module.
+**The RPi crashes/reboots when the fish moves:**
+This is likely a power brownout.
 
-**The fish extends his head when he should extend his body and extends his tail when he should extend his tail when he should extend his head.**
-
-The motor wires are the wrong way around for the body, swap the connections in the L298 module and it should work.
+  * Ensure you are using Ethernet, not WiFi.
+  * Edit /boot/config.txt and add max_usb_current=1 to ensure USB peripherals get enough power.
+  * Ensure the L298N is powered by an external supply, not the Raspberry Pi 5V pin.
