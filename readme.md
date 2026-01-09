@@ -1,5 +1,8 @@
 # Billy Bass Wyoming Satellite
 
+![HEY BILLY](/media/completed.png)
+
+
 This project allows you to create a Smart Speaker using a Raspberry Pi, a knock off Billy Bass fish and home assitant. You can see a demo of it in action here: 
 
 https://www.youtube.com/watch?v=FuD_6neGKRo
