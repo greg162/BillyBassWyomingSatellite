@@ -4,3 +4,4 @@
 /wyomingProcessing/temp/*
 /wyomingProcessing/__pycache__/*
 /wyomingProcessing/models--rhasspy--faster-whisper-medium-int8/*
+/AIProcessing/
